@@ -29,16 +29,16 @@
                 <a href="{{ route('admin.reservasi') }}" class="hover:text-gray-300">Reservasi</a>
                 <a href="{{ route('admin.konsultasi') }}" class="hover:text-gray-300">Konsultasi</a>
                 <a href="{{ route('admin.layanan') }}" class="hover:text-gray-300">Layanan</a>
-                <a href="{{ route('admin.galeri') }}" class="hover:text-gray-300">Galeri</a>
+                <a href="{{ route('admin.galery') }}" class="hover:text-gray-300">Galeri</a>
                 <a href="{{ route('admin.akun') }}" class="hover:text-gray-300">Akun</a>
-                <form action="{{ route('logout') }}" method="POST" class="inline">
+                <a href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                    class="hover:text-gray-300">
+                    Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
                     @csrf
-                    <button type="submit"
-                        class="hover:text-gray-300 bg-transparent border-none p-0 m-0 cursor-pointer">
-                        Logout
-                    </button>
                 </form>
-
             </nav>
         </div>
         <nav class="md:hidden bg-pink-700 text-white px-6 py-4 hidden" id="mobileMenu">
@@ -54,20 +54,20 @@
             <a class="block py-2 hover:text-gray-300" href="/admin/layanan">
                 Layanan
             </a>
-            <a class="block py-2 hover:text-gray-300 font-semibold underline" href="/admin/galeri">
+            <a class="block py-2 hover:text-gray-300 font-semibold underline" href="/admin/galery">
                 Galeri
             </a>
             <a class="block py-2 hover:text-gray-300" href="/admin/akun">
                 Akun
             </a>
-            <form action="{{ route('logout') }}" method="POST">
+            <a href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="hover:text-gray-300">
+                Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
                 @csrf
-                <button type="submit"
-                    class="block w-full text-left py-2 hover:text-gray-300 bg-transparent border-none">
-                    Logout
-                </button>
             </form>
-
         </nav>
     </header>
 

@@ -1,8 +1,11 @@
 <?php
 
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\Api\JadwalLayananController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ReservasiController;
+use App\Http\Controllers\Api\UserAuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('/admin/login', [AdminAuthController::class, 'login']);
+
+Route::post('/user/login', [UserAuthController::class, 'login']);
+
+Route::middleware('web')->post('/user/login', [UserAuthController::class, 'login']);

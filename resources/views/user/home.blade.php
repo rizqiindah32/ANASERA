@@ -16,22 +16,84 @@
 
 <body class="bg-white text-gray-800">
     <!-- Header -->
-    <header class="bg-pink-500 text-white">
+    <header class="bg-pink-500 text-white relative">
         <div class="container mx-auto flex justify-between items-center py-4 px-6">
             <div class="flex items-center">
-                <img src="{{ asset('uploads/Logo-ANASERA-1-rev01.jpg') }}" alt="Logo ANASERA" class="w-10 h-10 mr-3">
+                <img src="{{ asset('uploads/Logo-ANASERA-1-rev01.jpg') }}" alt="Logo ANASERA" class="w-10 h-10 mr-3" />
                 <h1 class="text-2xl font-bold">ANASERA</h1>
             </div>
-            <div class="hidden md:flex space-x-6">
-                <a class="hover:text-gray-300" href="/">Home</a>
-                <a class="hover:text-gray-300" href="/profile">Profile</a>
-                <a class="hover:text-gray-300" href="/layanan">Layanan</a>
-                <a class="hover:text-gray-300" href="/galery">Gallery</a>
-                <a class="hover:text-gray-300" href="/form_reservasi">Form Reservasi</a>
-                <a class="hover:text-gray-300" href="/konsultasi">Konsultasi</a>
-                <a class="hover:text-gray-300 font-semibold" href="/admin/login">Login</a>
-            </div>
+            <nav class="hidden md:flex space-x-6 items-center font-semibold">
+                <a class="hover:text-gray-300 transition-colors duration-200" href="/">Home</a>
+                <a class="hover:text-gray-300 transition-colors duration-200" href="/profile">Profile</a>
+                <a class="hover:text-gray-300 transition-colors duration-200" href="/layanan">Layanan Pasien</a>
+                <a class="hover:text-gray-300 transition-colors duration-200" href="/galery">Gallery</a>
+                <a class="hover:text-gray-300 transition-colors duration-200" href="/konsultasi">Konsultasi</a>
+                @guest
+                    <!-- Menu Login (Guest Only) -->
+                    <div class="relative" id="login-menu-desktop">
+                        <button id="login-toggle-desktop" class="flex items-center hover:text-gray-300 focus:outline-none">
+                            Login <i class="fas fa-caret-down ml-1"></i>
+                        </button>
+                        <div id="login-dropdown-desktop"
+                            class="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded-md shadow-lg hidden z-20">
+                            <a class="block px-4 py-2 hover:bg-pink-100 font-semibold" href="/admin/login">Admin</a>
+                            <a class="block px-4 py-2 hover:bg-pink-100 font-semibold" href="/login">User</a>
+                            <a class="block px-4 py-2 hover:bg-pink-100 font-semibold" href="/register">Register</a>
+                        </div>
+                    </div>
+                @endguest
+                @auth
+                    <a href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
+                        class="block px-4 py-2 bg-white text-pink-600 rounded font-semibold hover:bg-pink-100">
+                        Logout
+                    </a>
+                    <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="hidden">
+                        @csrf
+                    </form>
+                @endauth
+            </nav>
+            <button class="md:hidden focus:outline-none" id="mobile-menu-button">
+                <i class="fas fa-bars text-white text-2xl"></i>
+            </button>
         </div>
+        <nav class="md:hidden bg-pink-500 text-white px-6 py-4 space-y-3 hidden" id="mobile-menu">
+            <a class="block hover:text-gray-300 font-semibold" href="/">Home</a>
+            <a class="block hover:text-gray-300 font-semibold" href="/profile">Profile</a>
+            <a class="block hover:text-gray-300 font-semibold" href="/layanan">Layanan</a>
+            <a class="block hover:text-gray-300 font-semibold" href="/galery">Gallery</a>
+            <a class="block hover:text-gray-300 font-semibold" href="/form_reservasi">Form Reservasi</a>
+            <a class="block hover:text-gray-300 font-semibold" href="/konsultasi">Konsultasi</a>
+            @guest
+                <!-- Mobile Login Dropdown -->
+                <div class="relative" id="login-menu-mobile">
+                    <button id="login-toggle-mobile"
+                        class="w-full flex justify-between items-center font-semibold hover:text-gray-300 focus:outline-none">
+                        Login <i class="fas fa-caret-down ml-1"></i>
+                    </button>
+                    <div id="login-dropdown-mobile" class="mt-2 space-y-2 hidden">
+                        <a class="block px-4 py-2 bg-white text-pink-600 rounded font-semibold hover:bg-pink-100"
+                            href="/admin/login">Admin</a>
+                        <a class="block px-4 py-2 bg-white text-pink-600 rounded font-semibold hover:bg-pink-100"
+                            href="/login">User</a>
+                        <a class="block px-4 py-2 bg-white text-pink-600 rounded font-semibold hover:bg-pink-100"
+                            href="/register">Register</a>
+                    </div>
+                </div>
+            @endguest
+
+            @auth
+                <!-- Mobile Logout Button -->
+                <a href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
+                    class="block px-4 py-2 bg-white text-pink-600 rounded font-semibold hover:bg-pink-100">
+                    Logout
+                </a>
+                <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="hidden">
+                    @csrf
+                </form>
+            @endauth
+        </nav>
     </header>
 
     <!-- Hero Section -->
@@ -125,6 +187,39 @@
             </div>
         </div>
     </section>
+
+    <script>
+        /* DESKTOP dropdown */
+        const dToggle = document.getElementById('login-toggle-desktop');
+        const dDropdown = document.getElementById('login-dropdown-desktop');
+
+        dToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dDropdown?.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!dToggle.contains(e.target) && !dDropdown.contains(e.target)) {
+                dDropdown.classList.add('hidden');
+            }
+        });
+
+        /* MOBILE dropdown */
+        const mToggle = document.getElementById('login-toggle-mobile');
+        const mDropdown = document.getElementById('login-dropdown-mobile');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mToggle?.addEventListener('click', () => {
+            mDropdown?.classList.toggle('hidden');
+        });
+
+        /* Mobile menu hamburger */
+        mobileMenuButton?.addEventListener('click', () => {
+            mobileMenu?.classList.toggle('hidden');
+        });
+    </script>
+
 </body>
 
 </html>

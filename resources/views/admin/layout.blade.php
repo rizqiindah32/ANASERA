@@ -16,7 +16,7 @@
             <a href="{{ route('admin.reservasi') }}">Reservasi</a>
             <a href="{{ route('admin.konsultasi') }}">Konsultasi</a>
             <a href="{{ route('admin.layanan') }}">Layanan</a>
-            <a href="{{ route('admin.galeri') }}">Galeri</a>
+            <a href="{{ route('admin.galery') }}">Galeri</a>
             <a href="{{ route('admin.akun') }}">Akun</a>
         </nav>
     </aside>

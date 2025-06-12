@@ -30,9 +30,16 @@
                 <a href="{{ route('admin.reservasi') }}" class="hover:text-gray-300">Reservasi</a>
                 <a href="{{ route('admin.konsultasi') }}" class="hover:text-gray-300">Konsultasi</a>
                 <a href="{{ route('admin.layanan') }}" class="hover:text-gray-300">Layanan</a>
-                <a href="{{ route('admin.galeri') }}" class="hover:text-gray-300">Galeri</a>
+                <a href="{{ route('admin.galery') }}" class="hover:text-gray-300">Galeri</a>
                 <a href="{{ route('admin.akun') }}" class="hover:text-gray-300">Akun</a>
-                <a href="{{ route('logout') }}" class="hover:text-gray-300">Logout</a>
+                <a href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                    class="hover:text-gray-300">
+                    Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                    @csrf
+                </form>
             </nav>
         </div>
         <nav class="md:hidden bg-pink-700 text-white px-6 py-4 hidden" id="mobileMenu">
@@ -48,15 +55,20 @@
             <a class="block py-2 hover:text-gray-300" href="/admin/layanan">
                 Layanan
             </a>
-            <a class="block py-2 hover:text-gray-300 font-semibold underline" href="/admin/galeri">
+            <a class="block py-2 hover:text-gray-300 font-semibold underline" href="/admin/galery">
                 Galeri
             </a>
             <a class="block py-2 hover:text-gray-300" href="/admin/akun">
                 Akun
             </a>
-            <a class="block py-2 hover:text-gray-300" href="/logout">
+            <a href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="hover:text-gray-300">
                 Logout
             </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                @csrf
+            </form>
         </nav>
     </header>
 

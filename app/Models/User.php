@@ -13,19 +13,22 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
-     * Atribut yang boleh diisi massal (fillable).
+     * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
         'name',
-        'username', // TAMBAHKAN INI
         'email',
+        'username',
         'password',
+        'google_id',
+        'role',
     ];
 
+
     /**
-     * Atribut yang disembunyikan saat serialisasi.
+     * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
@@ -35,7 +38,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Atribut yang dikonversi secara otomatis.
+     * The attributes that should be cast.
      *
      * @var array<string, string>
      */

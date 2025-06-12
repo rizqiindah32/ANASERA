@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Konsultasi Admin - Konsultasi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://js.pusher.com/7.2/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo/dist/echo.iife.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <style>
@@ -16,25 +18,32 @@
     </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="min-h-screen bg-gray-50">
     <!-- Navigasi Atas -->
-    <header class="bg-pink-600 text-white shadow">
-        <div class="container mx-auto flex justify-between items-center py-4 px-6">
+    <header class="text-white bg-pink-600 shadow">
+        <div class="container flex items-center justify-between px-6 py-4 mx-auto">
             <div class="flex items-center">
                 <img src="{{ asset('uploads/Logo-ANASERA-1-rev01.jpg') }}" alt="Logo ANASERA" class="w-10 h-10 mr-3">
                 <h1 class="text-2xl font-bold">ANASERA Admin</h1>
             </div>
-            <nav class="hidden md:flex space-x-6">
+            <nav class="hidden space-x-6 md:flex">
                 <a href="{{ route('admin.dashboard') }}" class="hover:text-gray-300">Dashboard</a>
                 <a href="{{ route('admin.reservasi') }}" class="hover:text-gray-300">Reservasi</a>
-                <a href="{{ route('admin.konsultasi') }}" class="hover:text-gray-300">Konsultasi</a>
+                <a href="{{ route('chat.index') }}">Konsultasi</a>
                 <a href="{{ route('admin.layanan') }}" class="hover:text-gray-300">Layanan</a>
-                <a href="{{ route('admin.galeri') }}" class="hover:text-gray-300">Galeri</a>
+                <a href="{{ route('admin.galery') }}" class="hover:text-gray-300">Galeri</a>
                 <a href="{{ route('admin.akun') }}" class="hover:text-gray-300">Akun</a>
-                <a href="{{ route('logout') }}" class="hover:text-gray-300">Logout</a>
+                <a href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                    class="hover:text-gray-300">
+                    Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                    @csrf
+                </form>
             </nav>
         </div>
-        <nav class="md:hidden bg-pink-700 text-white px-6 py-4 hidden" id="mobileMenu">
+        <nav class="hidden px-6 py-4 text-white bg-pink-700 md:hidden" id="mobileMenu">
             <a class="block py-2 hover:text-gray-300" href="/admin/dashboard">
                 Dashboard
             </a>
@@ -47,279 +56,258 @@
             <a class="block py-2 hover:text-gray-300" href="/admin/layanan">
                 Layanan
             </a>
-            <a class="block py-2 hover:text-gray-300 font-semibold underline" href="/admin/galeri">
+            <a class="block py-2 font-semibold underline hover:text-gray-300" href="/admin/galery">
                 Galeri
             </a>
             <a class="block py-2 hover:text-gray-300" href="/admin/akun">
                 Akun
             </a>
-            <a class="block py-2 hover:text-gray-300" href="/logout">
+            <a href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="hover:text-gray-300">
                 Logout
             </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+                @csrf
+            </form>
         </nav>
     </header>
 
+    <div class="container p-2 mx-auto max-w-8xl">
+        <div id="chat-container" class="flex flex-col md:flex-row h-[700px] rounded-lg shadow-2xl overflow-hidden"
+            style="background: linear-gradient(135deg, #a78bfa, #f9a8d4, #93c5fd);">
 
-    <main class="container mx-auto px-4 py-6 flex-grow">
-        <h1 class="text-3xl font-bold text-pink-600 mb-6">Daftar Konsultasi Pengguna</h1>
+            <!-- Sidebar User List -->
+            <div class="overflow-y-auto border-r border-indigo-300 md:w-1/3 bg-white/80 backdrop-blur-md">
+                <div class="flex items-center justify-between p-4 border-b border-indigo-200">
+                    <h5 class="text-lg font-semibold text-indigo-900">Daftar Konsultasi</h5>
+                    <select id="theme-selector"
+                        class="px-2 py-1 text-sm text-indigo-700 border border-indigo-300 rounded">
+                        <option value="default" selected>Theme Default</option>
+                        <option value="pink">Pink</option>
+                        <option value="purple">Ungu</option>
+                        <option value="blue">Biru</option>
+                        <option value="green">Hijau</option>
+                        <option value="orange">Oren</option>
+                        <option value="gray">Abu-Abu</option>
+                    </select>
+                </div>
 
-        <div id="konsultasiList" class="space-y-6">
-            <div class="bg-white rounded shadow-md p-4 flex flex-col md:flex-row md:space-x-6" data-id="1">
-                <div class="md:w-1/3 mb-4 md:mb-0">
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-700">User:</span> John Doe
-                    </div>
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-700">Pesan:</span>
-                        <p class="bg-blue-100 p-2 rounded text-gray-800">Saya butuh bantuan dengan akun saya.</p>
-                    </div>
-                    <div class="text-sm text-gray-500 mt-2">
-                        Dikirim pada: 01 Jan 2023 10:00
-                    </div>
-                </div>
-                <div class="md:w-2/3 flex flex-col h-[350px]">
-                    <div class="font-semibold text-gray-700 mb-2">Konsultasi Interaktif</div>
-                    <div class="flex-1 bg-gray-50 border border-gray-300 rounded p-4 overflow-y-auto flex flex-col space-y-3"
-                        id="chat-1" aria-live="polite" aria-label="Chat messages with John Doe">
-                        <!-- Chat messages will appear here -->
-                    </div>
-                    <form class="replyForm mt-3 flex gap-2" data-id="1" aria-label="Form balasan untuk John Doe">
-                        <textarea name="balasan" rows="2" class="flex-1 p-2 border border-gray-300 rounded resize-none"
-                            placeholder="Tulis balasan..."></textarea>
-                        <button type="submit"
-                            class="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded flex items-center justify-center"
-                            aria-label="Kirim balasan">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                        <button type="button"
-                            class="btnClear bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded flex items-center justify-center"
-                            aria-label="Bersihkan balasan">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </form>
-                </div>
+                <ul id="user-list" class="divide-y divide-indigo-300">
+                    @foreach ($users as $user)
+                        <li data-id="{{ $user->id }}" data-type="App\\Models\\User"
+                            class="flex items-center px-4 py-3 space-x-3 cursor-pointer hover:bg-indigo-200">
+                            <div
+                                class="flex items-center justify-center w-10 h-10 font-bold text-white rounded-full shadow bg-gradient-to-tr from-purple-500 via-pink-500 to-blue-400">
+                                {{ strtoupper(substr($user->name, 0, 1)) }}
+                            </div>
+                            <span class="font-medium text-indigo-900 truncate">{{ $user->name }}</span>
+                        </li>
+                    @endforeach
+                </ul>
             </div>
 
-            <div class="bg-white rounded shadow-md p-4 flex flex-col md:flex-row md:space-x-6" data-id="11">
-                <div class="md:w-1/3 mb-4 md:mb-0">
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-700">User:</span> Irene King
-                    </div>
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-700">Pesan:</span>
-                        <p class="bg-blue-100 p-2 rounded text-gray-800">Bagaimana cara mengaktifkan notifikasi?</p>
-                    </div>
-                    <div class="text-sm text-gray-500 mt-2">
-                        Dikirim pada: 11 Jan 2023 20:00
-                    </div>
+            <!-- Chat Area -->
+            <div class="flex flex-col md:w-2/3 bg-white/90 backdrop-blur-md">
+                <div id="chat-box"
+                    class="flex-1 p-6 space-y-4 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-400 scrollbar-track-transparent">
+                    <p class="italic text-center text-indigo-600 select-none">Pilih user untuk mulai chat</p>
                 </div>
-                <div class="md:w-2/3 flex flex-col h-[350px]">
-                    <div class="font-semibold text-gray-700 mb-2">Konsultasi Interaktif</div>
-                    <div class="flex-1 bg-gray-50 border border-gray-300 rounded p-4 overflow-y-auto flex flex-col space-y-3"
-                        id="chat-11" aria-live="polite" aria-label="Chat messages with Irene King">
-                    </div>
-                    <form class="replyForm mt-3 flex gap-2" data-id="11" aria-label="Form balasan untuk Irene King">
-                        <textarea name="balasan" rows="2" class="flex-1 p-2 border border-gray-300 rounded resize-none"
-                            placeholder="Tulis balasan..."></textarea>
-                        <button type="submit"
-                            class="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded flex items-center justify-center"
-                            aria-label="Kirim balasan">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                        <button type="button"
-                            class="btnClear bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded flex items-center justify-center"
-                            aria-label="Bersihkan balasan">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
 
-            <div class="bg-white rounded shadow-md p-4 flex flex-col md:flex-row md:space-x-6" data-id="14">
-                <div class="md:w-1/3 mb-4 md:mb-0">
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-700">User:</span> Larry Nelson
+                <div
+                    class="flex items-center justify-between p-4 space-x-3 border-t border-indigo-300 bg-white/80 backdrop-blur-sm">
+                    <div class="flex items-center space-x-2">
+                        <label for="bubble-color" class="text-sm font-semibold text-indigo-700">Warna Bubble:</label>
+                        <select id="bubble-color"
+                            class="px-2 py-1 text-indigo-700 border border-indigo-300 rounded cursor-pointer">
+                            <option value="pink">Pink</option>
+                            <option value="purple" selected>Ungu</option>
+                            <option value="blue">Biru</option>
+                            <option value="green">Hijau</option>
+                            <option value="orange">Oren</option>
+                            <option value="gray">Abu-Abu</option>
+                        </select>
                     </div>
-                    <div class="mb-2">
-                        <span class="font-semibold text-gray-700">Pesan:</span>
-                        <p class="bg-blue-100 p-2 rounded text-gray-800">Aplikasi tidak bisa terhubung ke internet.</p>
-                    </div>
-                    <div class="text-sm text-gray-500 mt-2">
-                        Dikirim pada: 14 Jan 2023 23:00
-                    </div>
-                </div>
-                <div class="md:w-2/3 flex flex-col h-[350px]">
-                    <div class="font-semibold text-gray-700 mb-2">Konsultasi Interaktif</div>
-                    <div class="flex-1 bg-gray-50 border border-gray-300 rounded p-4 overflow-y-auto flex flex-col space-y-3"
-                        id="chat-14" aria-live="polite" aria-label="Chat messages with Larry Nelson">
-                    </div>
-                    <form class="replyForm mt-3 flex gap-2" data-id="14"
-                        aria-label="Form balasan untuk Larry Nelson">
-                        <textarea name="balasan" rows="2" class="flex-1 p-2 border border-gray-300 rounded resize-none"
-                            placeholder="Tulis balasan..."></textarea>
+
+                    <form id="chat-form" class="flex items-center flex-1 space-x-3">
+                        @csrf
+                        <input type="hidden" id="receiver_id" name="receiver_id">
+                        <input type="text" id="message" name="message" placeholder="Tulis pesan..."
+                            autocomplete="off"
+                            class="flex-1 px-4 py-2 border border-indigo-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            disabled>
                         <button type="submit"
-                            class="bg-pink-500 hover:bg-pink-600 text-white py-2 px-4 rounded flex items-center justify-center"
-                            aria-label="Kirim balasan">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                        <button type="button"
-                            class="btnClear bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded flex items-center justify-center"
-                            aria-label="Bersihkan balasan">
-                            <i class="fas fa-times"></i>
+                            class="px-5 py-2 font-semibold text-white bg-indigo-600 rounded-lg shadow-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled>
+                            Kirim
                         </button>
                     </form>
                 </div>
             </div>
         </div>
-    </main>
+    </div>
 
     <script>
-        // Mobile menu toggle
-        const mobileMenuButton = document.getElementById('mobileMenuButton');
-        const mobileMenu = document.getElementById('mobileMenu');
-        if (mobileMenuButton && mobileMenu) {
-            mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
-            });
-        }
+        let selectedUserId = null;
+        let selectedUserType = null;
 
-        // Simulated user messages for interactivity
-        const userMessages = {
-            1: [{
-                sender: 'user',
-                text: 'Saya butuh bantuan dengan akun saya.',
-                time: '01 Jan 2023 10:00'
-            }],
-            11: [{
-                sender: 'user',
-                text: 'Bagaimana cara mengaktifkan notifikasi?',
-                time: '11 Jan 2023 20:00'
-            }],
-            14: [{
-                sender: 'user',
-                text: 'Aplikasi tidak bisa terhubung ke internet.',
-                time: '14 Jan 2023 23:00'
-            }]
+        const chatBox = document.getElementById('chat-box');
+        const userList = document.getElementById('user-list');
+        const chatForm = document.getElementById('chat-form');
+        const receiverInput = document.getElementById('receiver_id');
+        const messageInput = document.getElementById('message');
+        const bubbleColorSelect = document.getElementById('bubble-color');
+        const themeSelector = document.getElementById('theme-selector');
+        const chatContainer = document.getElementById('chat-container');
+
+        const bubbleColors = {
+            pink: {
+                sent: '#fbcfe8',
+                received: '#fce7f3'
+            },
+            purple: {
+                sent: '#c4b5fd',
+                received: '#ede9fe'
+            },
+            blue: {
+                sent: '#93c5fd',
+                received: '#dbeafe'
+            },
+            green: {
+                sent: '#bbf7d0',
+                received: '#dcfce7'
+            },
+            orange: {
+                sent: '#fed7aa',
+                received: '#ffedd5'
+            },
+            gray: {
+                sent: '#e5e7eb',
+                received: '#f3f4f6'
+            }
         };
 
-        // Function to create a chat bubble
-        function createChatBubble(sender, text, time) {
-            const bubble = document.createElement('div');
-            bubble.classList.add('max-w-[75%]', 'break-words', 'relative', 'px-3', 'py-2', 'rounded-lg', 'shadow-sm');
-            const timeEl = document.createElement('div');
-            timeEl.classList.add('text-xs', 'text-gray-400', 'mt-1', 'select-none');
-            timeEl.textContent = time;
+        const themes = {
+            default: 'linear-gradient(135deg, #a78bfa, #f9a8d4, #93c5fd)',
+            pink: 'linear-gradient(135deg, #f9a8d4, #f472b6, #fbbf24)',
+            purple: 'linear-gradient(135deg, #7c3aed, #c4b5fd, #8b5cf6)',
+            blue: 'linear-gradient(135deg, #3b82f6, #93c5fd, #60a5fa)',
+            green: 'linear-gradient(135deg, #22c55e, #bbf7d0, #4ade80)',
+            orange: 'linear-gradient(135deg, #f97316, #fdba74, #fb923c)',
+            gray: 'linear-gradient(135deg, #9ca3af, #d1d5db, #6b7280)',
+        };
 
-            if (sender === 'admin') {
-                bubble.classList.add('bg-pink-100', 'text-pink-800', 'self-end');
-                bubble.setAttribute('aria-label', 'Balasan admin: ' + text);
-            } else {
-                bubble.classList.add('bg-blue-100', 'text-gray-800', 'self-start');
-                bubble.setAttribute('aria-label', 'Pesan pengguna: ' + text);
-            }
-            bubble.textContent = text;
-            bubble.appendChild(timeEl);
-            return bubble;
+        function clearActiveUser() {
+            userList.querySelectorAll('li').forEach(li =>
+                li.classList.remove('bg-indigo-200')
+            );
         }
 
-        // Load initial user messages into chat containers
-        Object.entries(userMessages).forEach(([id, messages]) => {
-            const chatContainer = document.getElementById(`chat-${id}`);
-            if (chatContainer) {
-                messages.forEach(msg => {
-                    const bubble = createChatBubble(msg.sender, msg.text, msg.time);
-                    chatContainer.appendChild(bubble);
-                });
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-        });
+        function enableChatForm(enable = true) {
+            messageInput.disabled = !enable;
+            chatForm.querySelector('button[type=submit]').disabled = !enable;
+        }
 
-        // Handle reply form submissions
-        document.querySelectorAll('.replyForm').forEach(form => {
-            form.addEventListener('submit', e => {
-                e.preventDefault();
-                const textarea = form.querySelector('textarea[name="balasan"]');
-                const replyText = textarea.value.trim();
-                if (!replyText) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Balasan tidak boleh kosong.',
-                    });
-                    return;
-                }
-                const konsultasiId = form.dataset.id;
-                const chatContainer = document.getElementById(`chat-${konsultasiId}`);
+        function fetchMessages(userId) {
+            const type = selectedUserType;
+            fetch(`/chat/messages/${userId}?type=${encodeURIComponent(type)}`)
+                .then(response => response.json())
+                .then(data => {
+                    chatBox.innerHTML = '';
+                    const bubbleTheme = bubbleColors[bubbleColorSelect.value] || bubbleColors.purple;
 
-                // Create admin reply bubble
-                const now = new Date();
-                const timeString = now.toLocaleString('id-ID', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                }).replace(/,/g, '');
+                    data.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.textContent = msg.message;
+                        div.className =
+                            'max-w-[70%] px-5 py-3 rounded-lg break-words animate-fade-in shadow-md';
+                        div.style.transition = 'background-color 0.3s ease';
 
-                const replyBubble = createChatBubble('admin', replyText, timeString);
+                        // Ganti sesuai guard yang sedang aktif. Misal: untuk admin login:
+                        const currentUserId = {{ auth()->guard('admin')->id() ?? 'null' }};
 
-                // Add delete button for each admin reply
-                const deleteBtn = document.createElement('button');
-                deleteBtn.type = 'button';
-                deleteBtn.className = 'absolute top-1 right-1 text-pink-600 hover:text-pink-900';
-                deleteBtn.innerHTML = '<i class="fas fa-times"></i>';
-                deleteBtn.title = 'Hapus balasan';
-                deleteBtn.setAttribute('aria-label', 'Hapus balasan admin');
-                deleteBtn.addEventListener('click', () => {
-                    Swal.fire({
-                        title: 'Hapus balasan?',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#aaa',
-                        confirmButtonText: 'Ya, hapus',
-                        cancelButtonText: 'Batal'
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            replyBubble.remove();
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil',
-                                text: 'Balasan telah dihapus.',
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
+                        if (msg.sender_id == currentUserId) {
+                            div.style.backgroundColor = bubbleTheme.sent;
+                            div.style.alignSelf = 'flex-end';
+                            div.style.textAlign = 'right';
+                            div.style.borderTopRightRadius = '0';
+                            div.style.marginLeft = 'auto';
+                        } else {
+                            div.style.backgroundColor = bubbleTheme.received;
+                            div.style.alignSelf = 'flex-start';
+                            div.style.textAlign = 'left';
+                            div.style.borderTopLeftRadius = '0';
+                            div.style.marginRight = 'auto';
                         }
+
+                        chatBox.appendChild(div);
                     });
+
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                })
+                .catch(error => {
+                    chatBox.innerHTML = '<p class="italic text-center text-red-500">Gagal memuat pesan</p>';
+                    console.error(error);
                 });
-                replyBubble.style.position = 'relative';
-                replyBubble.appendChild(deleteBtn);
+        }
 
-                chatContainer.appendChild(replyBubble);
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-
-                // Clear textarea
-                textarea.value = '';
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: 'Balasan berhasil dikirim.',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
+        userList.querySelectorAll('li').forEach(item => {
+            item.addEventListener('click', () => {
+                clearActiveUser();
+                selectedUserId = item.getAttribute('data-id');
+                selectedUserType = item.getAttribute('data-type');
+                receiverInput.value = selectedUserId;
+                chatBox.innerHTML = '<p class="italic text-center text-indigo-600">Loading...</p>';
+                chatForm.classList.remove('hidden');
+                enableChatForm(true);
+                item.classList.add('bg-indigo-200');
+                fetchMessages(selectedUserId);
             });
-
-            // Clear button functionality
-            const clearBtn = form.querySelector('.btnClear');
-            if (clearBtn) {
-                clearBtn.addEventListener('click', () => {
-                    form.querySelector('textarea[name="balasan"]').value = '';
-                });
-            }
         });
+
+        chatForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            fetch('/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        receiver_id: selectedUserId,
+                        receiver_type: selectedUserType,
+                        message: message
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    messageInput.value = '';
+                    fetchMessages(selectedUserId);
+                })
+                .catch(error => {
+                    console.error("Gagal mengirim pesan:", error);
+                });
+        });
+
+        bubbleColorSelect.addEventListener('change', () => {
+            if (selectedUserId) fetchMessages(selectedUserId);
+        });
+
+        themeSelector.addEventListener('change', () => {
+            updateTheme(themeSelector.value);
+        });
+
+        function updateTheme(theme) {
+            chatContainer.style.background = themes[theme] || themes.default;
+        }
+
+        updateTheme('default');
+        enableChatForm(false);
     </script>
+
 </body>
 
 </html>

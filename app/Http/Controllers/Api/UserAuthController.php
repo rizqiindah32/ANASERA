@@ -3,45 +3,32 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Hash; // <-- ini yang penting
 use App\Models\User;
-
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class UserAuthController extends Controller
 {
-    public function login(Request $request)
-    {
-        // Validasi input
-        $validator = Validator::make($request->all(), [
-            'username' => 'required|string',
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+ public function register(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:6|confirmed',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
-            ], 422);
-        }
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+    ]);
 
-        // Coba cari user berdasarkan username dan email
-        $user = User::where('username', $request->username)
-                    ->where('email', $request->email)
-                    ->first();
+    return response()->json([
+        'success' => true,
+        'message' => 'Registrasi berhasil.',
+        'user' => $user
+    ]);
+}
 
-                    if (!$user || !Hash::check($request->password, $user->password)) {
-                        return response()->json([
-                            'message' => 'Username, Email, atau Password salah.'
-                        ], 401);
-                    }
-
-        // Autentikasi berhasil
-        return response()->json([
-            'message' => 'Login berhasil',
-            'user' => $user,
-        ]);
-    }
 }

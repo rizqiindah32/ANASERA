@@ -32,10 +32,19 @@
             <div class="hidden md:flex space-x-6">
                 <a class="hover:text-gray-300" href="{{ url('/') }}">Home</a>
                 <a class="hover:text-gray-300" href="{{ url('/profile') }}">Profile</a>
-                <a class="hover:text-gray-300" href="{{ url('/layanan') }}">Layanan</a>
+                <a class="hover:text-gray-300" href="{{ url('/layanan') }}">Layanan Pasien</a>
                 <a class="hover:text-gray-300" href="{{ url('/galery') }}">Gallery</a>
-                <a class="hover:text-gray-300" href="{{ url('/form_reservasi') }}">Form Reservasi</a>
                 <a class="hover:text-gray-300" href="{{ url('/konsultasi') }}">Konsultasi</a>
+                @auth
+                    <a href="{{ route('logout') }}"
+                        onclick="event.preventDefault(); document.getElementById('logout-form-mobile').submit();"
+                        class="block px-4 py-2 bg-white text-pink-600 rounded font-semibold hover:bg-pink-100">
+                        Logout
+                    </a>
+                    <form id="logout-form-mobile" action="{{ route('logout') }}" method="POST" class="hidden">
+                        @csrf
+                    </form>
+                @endauth
             </div>
         </div>
     </header>

@@ -28,13 +28,15 @@
                 <a href="{{ route('admin.reservasi') }}" class="hover:text-gray-300">Reservasi</a>
                 <a href="{{ route('admin.konsultasi') }}" class="hover:text-gray-300">Konsultasi</a>
                 <a href="{{ route('admin.layanan') }}" class="hover:text-gray-300">Layanan</a>
-                <a href="{{ route('admin.galeri') }}" class="hover:text-gray-300">Galeri</a>
+                <a href="{{ route('admin.galery') }}" class="hover:text-gray-300">Galeri</a>
                 <a href="{{ route('admin.akun') }}" class="hover:text-gray-300">Akun</a>
-
-                <!-- FORM LOGOUT (POST) -->
-                <form method="POST" action="{{ route('logout') }}">
+                <a href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                    class="hover:text-gray-300">
+                    Logout
+                </a>
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
                     @csrf
-                    <button type="submit" class="hover:text-gray-300 bg-transparent">Logout</button>
                 </form>
             </nav>
         </div>
@@ -45,11 +47,15 @@
             <a class="block py-2 hover:text-gray-300" href="{{ route('admin.reservasi') }}">Reservasi</a>
             <a class="block py-2 hover:text-gray-300" href="{{ route('admin.konsultasi') }}">Konsultasi</a>
             <a class="block py-2 hover:text-gray-300" href="{{ route('admin.layanan') }}">Layanan</a>
-            <a class="block py-2 hover:text-gray-300" href="{{ route('admin.galeri') }}">Galeri</a>
+            <a class="block py-2 hover:text-gray-300" href="{{ route('admin.galery') }}">Galeri</a>
             <a class="block py-2 hover:text-gray-300" href="{{ route('admin.akun') }}">Akun</a>
-            <form method="POST" action="{{ route('logout') }}">
+            <a href="{{ route('logout') }}"
+                onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="hover:text-gray-300">
+                Logout
+            </a>
+            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
                 @csrf
-                <button type="submit" class="block py-2 text-left hover:text-gray-300 bg-transparent">Logout</button>
             </form>
         </nav>
     </header>
@@ -64,6 +70,7 @@
                     <tr>
                         <th class="py-2 px-4 border border-pink-600 text-left">Nama Anak</th>
                         <th class="py-2 px-4 border border-pink-600 text-left">Tanggal Lahir</th>
+                        <th class="py-2 px-4 border border-pink-600 text-left">Tanggal Reservasi</th>
                         <th class="py-2 px-4 border border-pink-600 text-left">Usia</th>
                         <th class="py-2 px-4 border border-pink-600 text-left">Jenis Kelamin</th>
                         <th class="py-2 px-4 border border-pink-600 text-left">Pendidikan</th>
@@ -73,28 +80,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Contoh Baris Data -->
-                    <tr class="hover:bg-gray-100">
-                        <td class="py-2 px-4 border border-gray-200">Salsa Nabila</td>
-                        <td class="py-2 px-4 border border-gray-200">2018-06-12</td>
-                        <td class="py-2 px-4 border border-gray-200">5 th</td>
-                        <td class="py-2 px-4 border border-gray-200 capitalize">perempuan</td>
-                        <td class="py-2 px-4 border border-gray-200">TK</td>
-                        <td class="py-2 px-4 border border-gray-200">Jakarta</td>
-                        <td class="py-2 px-4 border border-gray-200">Terapi Wicara: Sulit menyebutkan kata dengan jelas
-                        </td>
-                        <td class="py-2 px-4 border border-gray-200 text-center">
-                            <form onsubmit="return confirm('Yakin ingin hapus data ini?')">
-                                <button type="submit"
-                                    class="text-red-600 hover:text-red-800 flex items-center justify-center space-x-1 mx-auto">
-                                    <i class="fas fa-trash-alt"></i><span>Hapus</span>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-
-                    <!-- Tambahan baris lainnya bisa disisipkan di sini -->
+                    @forelse ($reservasis as $reservasi)
+                        <tr class="hover:bg-gray-100">
+                            <td class="py-2 px-4 border border-gray-200">{{ $reservasi->nama_anak }}</td>
+                            <td class="py-2 px-4 border border-gray-200">{{ $reservasi->tanggal_lahir }}</td>
+                            <td class="py-2 px-4 border border-gray-200">{{ $reservasi->tanggal_reservasi }}</td>
+                            <td class="py-2 px-4 border border-gray-200">{{ $reservasi->usia }} th</td>
+                            <td class="py-2 px-4 border border-gray-200 capitalize">{{ $reservasi->jenis_kelamin }}
+                            </td>
+                            <td class="py-2 px-4 border border-gray-200">{{ $reservasi->pendidikan }}</td>
+                            <td class="py-2 px-4 border border-gray-200">{{ $reservasi->domisili }}</td>
+                            <td class="py-2 px-4 border border-gray-200">{{ $reservasi->keluhan }}</td>
+                            {{-- <td class="py-2 px-4 border border-gray-200 text-center">
+                                <form method="POST" action="{{ route('admin.reservasi.destroy', $reservasi->id) }}"
+                                    onsubmit="return confirm('Yakin ingin hapus data ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="text-red-600 hover:text-red-800 flex items-center justify-center space-x-1 mx-auto">
+                                        <i class="fas fa-trash-alt"></i><span>Hapus</span>
+                                    </button>
+                                </form>
+                            </td> --}}
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-gray-500">Tidak ada data reservasi.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
+
             </table>
         </div>
     </div>
