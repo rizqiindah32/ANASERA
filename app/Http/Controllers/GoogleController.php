@@ -16,7 +16,7 @@ class GoogleController extends Controller
     // Redirect ke Google
     public function redirectToGoogle()
     {
-        return Socialite::driver('google')->redirect();
+        return Socialite::driver('google')->stateless()->redirect();
     }
 
 
@@ -26,25 +26,19 @@ class GoogleController extends Controller
     try {
 
 
-        $googleUser = Socialite::driver('google')->user(); // atau ->stateless()->user();
-        // throw new \Exception('Ini simulasi error login Google');
-        // Cek apakah user dengan email ini sudah ada
-        $user = User::where('email', $googleUser->getEmail())->first();
-
-        // Kalau belum ada, buat user baru
-        if (!$user) {
-            $user = User::create([
+         $googleUser = Socialite::driver('google')->stateless()->user();
+        $user = User::firstOrCreate(
+            ['email' => $googleUser->getEmail()],
+            [
                 'name' => $googleUser->getName(),
-                'email' => $googleUser->getEmail(),
-                'google_id' => $googleUser->getId(),
-                'password' => bcrypt('password'), // Password random
-            ]);
-        }
+                'password' => bcrypt('password'), // bisa diganti random
+            ]
+        );
 
-        // Login user
         Auth::login($user);
 
-        return redirect('/layanan');
+        return redirect()->intended('/layanan');
+
     } catch (InvalidStateException $e) {
     Log::error('Invalid state saat login Google', [
         'message' => $e->getMessage(),

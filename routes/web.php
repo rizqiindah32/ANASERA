@@ -11,6 +11,7 @@ use App\Http\Controllers\LayananController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ReservasiController;
 
+
 /* ---------- HALAMAN USER ---------- */
 Route::view('/',             'user.home');
 Route::view('/profile',      'user.profile');
@@ -28,9 +29,9 @@ Route::post('/user/reservasi', [ReservasiController::class, 'store'])
 Route::get('/reservasi/create/{tanggal}', [ReservasiController::class, 'create'])->name('reservasi.create');
 
 /* ---------- LOGIN USER ---------- */
-Route::get('/layanan', function () {
-    return view('user.layanan');
-});
+Route::get('/layanan', [LayananController::class, 'index'])->middleware('auth');
+Route::get('/konsultasi', [ChatController::class, 'index'])->middleware('auth');
+
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', function () {
     Auth::logout();
@@ -61,8 +62,6 @@ Route::prefix('admin')->group(function () {
 
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
-
-Route::get('/layanan', [LayananController::class, 'index']);
 
 Route::get('/reservasi', [ReservasiController::class, 'index'])->name('reservasi.index');
 
